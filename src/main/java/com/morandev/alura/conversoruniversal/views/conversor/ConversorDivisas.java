@@ -1,29 +1,28 @@
 package com.morandev.alura.conversoruniversal.views.conversor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.text.NumberFormat;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JTextField;
 import java.util.stream.Collectors;
-
+import java.util.*;
 
 import com.morandev.alura.conversoruniversal.service.serviceimpl.ConvertidorDivisasService;
 import com.morandev.alura.conversoruniversal.service.serviceimpl.DemoHiloService;
 import com.morandev.alura.conversoruniversal.service.serviceimpl.ListarDataService;
-import java.text.NumberFormat;
-import java.util.List;
-import javax.swing.JComponent;
-import javax.swing.JTextField;
+import java.math.RoundingMode;
 
 public class ConversorDivisas extends javax.swing.JPanel {
     
     private ConvertidorDivisasService convertidor = new ConvertidorDivisasService();
-    private Map< String, Object > simbolos = new HashMap<>();
+    private Map< String, String > simbolos = new HashMap<>();
     
     private String divisaFrom = "";
     private String divisaTo = "";
+    // DEFAULT_DIVISA: deberia contener solo 3 letras, estar en mayusculas,
+    // y estar contenida la variable simbolos
+    // ARS = peso argentino
+    private final String DEFAULT_DIVISA = "ARS"; 
     private DemoHiloService hiloService;
     
     /**
@@ -40,61 +39,92 @@ public class ConversorDivisas extends javax.swing.JPanel {
     * Configuraciones iniciales del Panel
     */
     private void init() {
-        enabledInputs( false );
+        enabledInputs( true );
         toggleVisible( descTxt );
-        fillComboBoxes();
+        setComboBoxesConfig();
+        
+        // TODO: HILOS!!!
         hiloService = new DemoHiloService();
         hiloService.setBar( pBar );
         hiloService.start();
+        
+        setInitialDivisas();
     }
     
-    private void fillComboBoxes() {
-        ArrayList< String > divisasSimbolos = null;
-        ArrayList< Object > divisasNames = null;
-        List<String> strings = null;
+    /**
+     * 
+     *  METODO DE CONFIGURACION: debera ser utilizado una sola vez
+     * 
+     */
+    private void setComboBoxesConfig() {
         
-        if( simbolos.isEmpty() ) {
-            simbolos = ListarDataService.listarSimbolos();
-            divisasSimbolos = new ArrayList<>( simbolos.keySet() );
-            divisasNames = new ArrayList<>( simbolos.values() );
-            
-            strings = divisasNames.stream()
-                                        .map(object -> Objects.toString(object, null))
-                                        .collect( Collectors.toList());
-            
-            
-            Collections.sort( strings );
-            Collections.sort( divisasSimbolos );
-        }
+        //llenar simbolos con nombre de divisas y sus abreviaciones
+        simbolos = ListarDataService.listarSimbolos();
+
+        //separamos nombres de abreviaciones
+        ArrayList< String > divisasSimbolos = new ArrayList<>( simbolos.keySet() );
+        ArrayList< String > divisasNames = new ArrayList<>( simbolos.values() );
+
+        //ordenamos nombres y abreviaciones
+        Collections.sort( divisasNames );
+        Collections.sort( divisasSimbolos );
 
         this.cmbDivisa.removeAllItems();
         this.cmbDivisa2.removeAllItems();
 
-        strings.forEach( value -> {
-            this.cmbDivisa.addItem("  " + value + " ");
-            this.cmbDivisa2.addItem("  " + value + " ");
+        // Los valores insertados en cada combo box
+        // presentan un espacio al inicio y al final
+        // antes de usar estos valores, utilizar el metodo String.trim()
+        divisasNames.forEach( name -> {
+                this.cmbDivisa.addItem("  " + name + " ");
+                this.cmbDivisa2.addItem("  " + name + " ");
         });
         
+        this.cmbDivisa.setSelectedIndex(0);
+        this.cmbDivisa2.setSelectedIndex(0);
     }
     
-    private Set<String> getDivisasKeys( Map< String, Object > map, String value ) {
+    private String getDivisaKey( String divisaName ) {
+        
+        Set divisasKeys;
+        
+         divisasKeys = this.simbolos
+                                .entrySet()
+                                .stream()
+                                .filter(entry -> Objects.equals( entry.getValue(), divisaName ))
+                                .map(Map.Entry::getKey)
+                                .collect(Collectors.toSet());
+        
+        String divisaKey = (String) divisasKeys.stream().toList().get(0);
 
-        return map
-                .entrySet()
-                .stream()
-                .filter(entry -> Objects.equals(entry.getValue(), value))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toSet());
+        System.out.println("Yo saque de simbolos esta key: " + divisaKey );
+        
+        return divisaKey;
     }
     
     private void updateDescription(java.math.BigDecimal amountI, java.math.BigDecimal amountF, String divisaFromName, String divisaToName ) {
         
-        String initialAmountFormatted = NumberFormat.getCurrencyInstance().format( amountI );
-        String finalAmountFormatted = NumberFormat.getCurrencyInstance().format( amountF );
+        String initialAmountFormatted = formatBigDecimalAmount( amountI ); 
+        String finalAmountFormatted = formatBigDecimalAmount( amountF ); 
         
         String desc = "<html><p>" + initialAmountFormatted + " " + divisaFromName + "<br><center> Equivale </center><br>" + finalAmountFormatted + " " + divisaToName + "</p></html>";
         
         this.descTxt.setText( desc );
+    }
+    
+    /**
+     *  Da formato a un objeto BigDecimal que representa un monto a este formato String: $ ##.###,##
+     * 
+     * @param amountI monto
+     * @return String
+     */
+    private String formatBigDecimalAmount(java.math.BigDecimal amountI) {
+        // Redondeo a dos decimales
+        amountI = amountI.setScale( 2, RoundingMode.HALF_UP );
+        // Representacion de cadena que incluye signo $
+        String amountFormatted = NumberFormat.getCurrencyInstance().format( amountI );
+        
+        return amountFormatted;
     }
     
     private void toggleVisible(JComponent comp) {
@@ -109,6 +139,11 @@ public class ConversorDivisas extends javax.swing.JPanel {
     
     private java.math.BigDecimal convertDivise( String divisaFromName, String divisaToName, java.math.BigDecimal amount ) {
         
+        System.out.println("el usuario quiere que: ");
+        System.out.println("yo convierta de: " + divisaFromName);
+        System.out.println("a: " + divisaToName);
+        System.out.println("esta cantidad: " + amount.doubleValue());
+        
         java.math.BigDecimal amountConverted = new java.math.BigDecimal(0);
         
         try {
@@ -116,7 +151,7 @@ public class ConversorDivisas extends javax.swing.JPanel {
             amountConverted = this.convertidor.convertir( divisaFromName, divisaToName, amount.doubleValue() );
             
         } catch ( Exception e ) {
-            System.out.println("aca exploto che!");
+            System.out.println( "Exploto che: " + e.getMessage() );
             System.out.println( e.getMessage() );
             e.printStackTrace();
             
@@ -134,48 +169,57 @@ public class ConversorDivisas extends javax.swing.JPanel {
     
     private void convertAndPrintInputData(JTextField input) {
         
-        System.out.println("Asi llego: " + input.getText());
-        //prevenir para casos de inputs con mas de un punto decimal
-        String inputValido = input.getText().replace(".", " ");
-        System.out.println("Vergeada 1: " + inputValido);
-        inputValido = inputValido.replace(" ", "");
-        System.out.println("Vergeada 2: " + inputValido);
-
-        
-        if ( inputValido.contains(",") && input.getText().equals( inputValido ) ) {
-            inputValido = inputValido.replace(",", ".");
-        } else {
-            inputValido = inputValido.replace(",", "");
-        }
-        
-        
-        System.out.println("quedo asi la verga: " + inputValido );
-
-//        
-//        //input data
-//        double initialAmount = Double.valueOf( inputValido );
-//        System.out.println( "Converti en esto " + initialAmount );
+        System.out.println(" Esto me manda el usuario: " + input.getText() );
        
-        java.math.BigDecimal finalValidInput = new java.math.BigDecimal( inputValido );
+        if( input.getText().isBlank() || input.getText().isEmpty() )
+            input.setText("1");
+        
+        java.math.BigDecimal finalValidInput = new java.math.BigDecimal( input.getText() );
 
-        //input data converted
         java.math.BigDecimal finalAmount = convertDivise(  divisaFrom, divisaTo, finalValidInput );
-        //input data converted
-        String finalAmountFormatted = String.format( "%,.2f", finalAmount.doubleValue() );    // ex: 1,234,567,890.12
 
         //input data formatted and printed
         if( Objects.equals( input , this.userInput ) ) {
-            userInput2.setText( String.valueOf( finalAmountFormatted ) );
+            userInput2.setText( formatBigDecimalAmount( finalAmount ) );
         } else {
-            userInput.setText( String.valueOf( finalAmountFormatted ) );
+            userInput.setText( formatBigDecimalAmount( finalAmount ) );
         }
 
-        updateDescription( finalValidInput, finalAmount, divisaFrom, divisaTo);
+        updateDescription( finalValidInput, finalAmount, divisaFrom, divisaTo );
 
         if( !this.descTxt.isVisible() ) {
              toggleVisible( descTxt );
         }
         
+    }
+    
+     private void setInitialDivisas() {
+         setDivisaFrom( this.cmbDivisa );
+         setDivisaTo( this.cmbDivisa2 );
+     }
+    
+    private void setDivisaFrom( JComboBox<String> cmbDivisa ) {
+        this.divisaFrom = getDivisa( cmbDivisa );
+    }
+    
+    private void setDivisaTo( JComboBox<String> cmbDivisa ) {
+        this.divisaTo = getDivisa( cmbDivisa );
+    }
+     
+    private String getDivisa( JComboBox<String> comboBoxDivisa ) {
+        
+        String valueSelected = (String) comboBoxDivisa.getSelectedItem();
+        
+        if( valueSelected == null || simbolos.containsValue( valueSelected ) ) 
+            throw new RuntimeException("Ningun match de el elemento seleccionado del parametro comboBoxDivisa\n con divisas");
+        
+        //El valor seleccionado del comboBoxVista trae espacios agregados 
+        valueSelected = valueSelected.trim();
+        
+        valueSelected = this.getDivisaKey( valueSelected );
+        
+        System.out.println( "Mira estoy en getDivisa y te voy a devolver esta divisa: " + valueSelected );
+        return valueSelected;
     }
     
     @SuppressWarnings("unchecked")
@@ -199,6 +243,7 @@ public class ConversorDivisas extends javax.swing.JPanel {
         cmbDivisa2.setForeground(new java.awt.Color(39, 68, 114));
         cmbDivisa2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "- select your divise" }));
         cmbDivisa2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmbDivisa2.setFocusable(false);
         cmbDivisa2.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cmbDivisa2ItemStateChanged(evt);
@@ -215,9 +260,6 @@ public class ConversorDivisas extends javax.swing.JPanel {
         userInput.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 userInputFocusGained(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                userInputFocusLost(evt);
             }
         });
         userInput.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -237,6 +279,7 @@ public class ConversorDivisas extends javax.swing.JPanel {
         cmbDivisa.setAutoscrolls(true);
         cmbDivisa.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         cmbDivisa.setDoubleBuffered(true);
+        cmbDivisa.setFocusable(false);
         cmbDivisa.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cmbDivisaItemStateChanged(evt);
@@ -247,9 +290,9 @@ public class ConversorDivisas extends javax.swing.JPanel {
         descTxt.setBackground(new java.awt.Color(212, 241, 244));
         descTxt.setFont(new java.awt.Font("Consolas", 0, 24)); // NOI18N
         descTxt.setForeground(new java.awt.Color(65, 114, 159));
-        descTxt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        descTxt.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         descTxt.setText("<html><center><p><center>peso argentino</center><br><center>Es igual a dolar estadounidense</center></p></center></html>");
-        panelConversor.add(descTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(95, 90, 500, 150));
+        panelConversor.add(descTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 500, 190));
 
         headerTitleTxt.setBackground(new java.awt.Color(212, 241, 244));
         headerTitleTxt.setFont(new java.awt.Font("Consolas", 1, 40)); // NOI18N
@@ -266,9 +309,6 @@ public class ConversorDivisas extends javax.swing.JPanel {
         userInput2.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 userInput2FocusGained(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                userInput2FocusLost(evt);
             }
         });
         userInput2.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -309,21 +349,24 @@ public class ConversorDivisas extends javax.swing.JPanel {
     private void cmbDivisaItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbDivisaItemStateChanged
         
         if( evt.getStateChange() == 1 ) {
-
-            String valueSelected = (String) this.cmbDivisa.getSelectedItem(); 
-            String keySelected = "";
-
-            valueSelected = valueSelected.trim();
-
-            if( simbolos.containsValue( valueSelected ) ) {
-
-                keySelected = getDivisasKeys( simbolos, valueSelected ).stream().toList().get(0);
-                this.divisaFrom = keySelected;
-
-                if( !divisaTo.isEmpty() ) this.enabledInputs( true );
-                if( !userInput2.getText().equals("Ejm 1000") ) convertAndPrintInputData( userInput );
-            }
+            //!userInput2.getText().isEmpty(
             
+            //inicio del programa
+            if( userInput.getText().equals("Ejm 1000") ) {
+                setDivisaFrom( cmbDivisa );
+            } else {
+            //el usuario interactua
+                
+                if ( userInput2.getText().isEmpty() ) {
+                    setDivisaTo( cmbDivisa );
+                    convertAndPrintInputData( userInput );
+                    return;
+                } 
+                
+                setDivisaFrom( cmbDivisa );
+                convertAndPrintInputData( userInput );
+                
+            }
         }
         
     }//GEN-LAST:event_cmbDivisaItemStateChanged
@@ -331,23 +374,26 @@ public class ConversorDivisas extends javax.swing.JPanel {
     private void cmbDivisa2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbDivisa2ItemStateChanged
         
         if( evt.getStateChange() == 1 ) {
+            //!userInput2.getText().isEmpty(
             
-            
-            String valueSelected = (String) this.cmbDivisa2.getSelectedItem();
-            String keySelected = "";
-
-            valueSelected = valueSelected.trim();
-
-            if( simbolos.containsValue( valueSelected ) ) {
-
-                keySelected = getDivisasKeys( simbolos, valueSelected ).stream().toList().get(0);
-                 this.divisaTo = keySelected;
-
-                 if( !divisaFrom.isEmpty() ) this.enabledInputs( true );
-                 if( !userInput.getText().equals("Ejm 1000") ) convertAndPrintInputData( userInput2 );
+            //inicio del programa
+            if( userInput2.getText().equals("Ejm 1000") ) {
+                setDivisaTo( cmbDivisa2 );
+            } else {
+            //el usuario interactua
+                
+                if ( userInput.getText().isEmpty() ) {
+                    setDivisaFrom( cmbDivisa2 );
+                    convertAndPrintInputData( userInput );
+                    return;
+                } 
+                
+                setDivisaTo( cmbDivisa2 );
+                convertAndPrintInputData( userInput );
+                
             }
-            
         }
+        
     }//GEN-LAST:event_cmbDivisa2ItemStateChanged
 
     /**
@@ -360,16 +406,7 @@ public class ConversorDivisas extends javax.swing.JPanel {
             userInput.setText("");
     }//GEN-LAST:event_userInputFocusGained
 
-    /**
-     *  Si este input pierde el foco mientras estaba vacio, le ingresamos texto por defecto
-     * 
-     * @param evt 
-     */
-    private void userInputFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_userInputFocusLost
-        if( userInput.getText().isBlank() || userInput.getText().isEmpty() )
-            userInput.setText("Ejm 1000");
-    }//GEN-LAST:event_userInputFocusLost
-   
+  
     /**
      *  Si este input gana el foco pero no tiene nada ingresado, se vacia
      * 
@@ -379,16 +416,6 @@ public class ConversorDivisas extends javax.swing.JPanel {
         if( userInput2.getText().equals("Ejm 1000") )
             userInput2.setText("");
     }//GEN-LAST:event_userInput2FocusGained
-
-    /**
-     *  Si este input pierde el foco mientras estaba vacio, le ingresamos texto por defecto
-     * 
-     * @param evt 
-     */
-    private void userInput2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_userInput2FocusLost
-        if( userInput2.getText().isBlank() || userInput2.getText().isEmpty() )
-            userInput2.setText("Ejm 1000");
-    }//GEN-LAST:event_userInput2FocusLost
 
     /**
      *  Si no es un digito lo que el usuario ingresa, lo consumimos
@@ -411,12 +438,16 @@ public class ConversorDivisas extends javax.swing.JPanel {
      */
     private void userInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_userInputKeyReleased
         
-//            if( userInput.getText().isEmpty() )
-//                userInput2.setText("");
+            if( userInput.getText().isEmpty() ) {
+                userInput2.setText("");
+                return;
+            }
             
-            
-            if( !divisaFrom.isEmpty() && !divisaTo.isEmpty() && !userInput.getText().isEmpty() )
+            if( !userInput.getText().isEmpty() || !userInput.getText().equals(ABORT)  )
                 convertAndPrintInputData( userInput );
+            
+            if ( userInput.getText().length() >= 15 )
+                userInput.setText("");
         
     }//GEN-LAST:event_userInputKeyReleased
     
@@ -441,12 +472,16 @@ public class ConversorDivisas extends javax.swing.JPanel {
      */
     private void userInput2KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_userInput2KeyReleased
                 
-//            if( userInput2.getText().isEmpty() )
-//                userInput.setText("");
+            if( userInput2.getText().isEmpty() ) {
+                userInput.setText("");            
+                return;
+            }
             
-            
-            if( !divisaFrom.isEmpty() && !divisaTo.isEmpty() && !userInput2.getText().isEmpty() )
+            if( !userInput2.getText().isEmpty() )
                 convertAndPrintInputData( userInput2 );
+            
+            if ( userInput2.getText().length() >= 15 )
+                userInput2.setText("");
       
     }//GEN-LAST:event_userInput2KeyReleased
 

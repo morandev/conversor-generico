@@ -38,12 +38,19 @@ public class JsonFileHelperService {
         return dataParsed;
     }
     
-    public static Map< String, Object > leerCurrencyData( String fileName ) throws IOException {
+    /**
+     *  Lee la data del archivo simbolos.json. Esto es los nombres de las divisas y sus abreviaciones.
+     * 
+     * @param fileName
+     * @return
+     * @throws IOException 
+     */
+    public static Map< String, String > leerCurrencyData( String fileName ) throws IOException {
         
         if ( fileName.isBlank() || fileName.isEmpty() || fileName == null )
-            throw new RuntimeException( "fileName: " + fileName );
+            throw new RuntimeException( "fileName: " + fileName + "\nse esperaba filenName = simbolos.json" );
         
-        Map< String, Object > dataParsed = null;
+        Map< String, String > dataParsed = null;
 
         try ( InputStream in = new FileInputStream( RUTA_POR_DEFECTO + fileName ) ) {
 
@@ -55,7 +62,7 @@ public class JsonFileHelperService {
             
             //dataParsed = gsonHelper.toJsonString( buffReader.lines().toArray() );
             
-            dataParsed = gsonHelper.toStringAndObjectMap( buffReader );
+            dataParsed = gsonHelper.toStringMap( buffReader );
 
         }
         

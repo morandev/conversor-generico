@@ -36,8 +36,10 @@ public class GsonHelper {
                 rate                                = Double.valueOf( conversionObj.get("rate").toString() );
                 
             } catch (InterruptedException ex) {
+                System.out.println( "Exploto che: " + ex.getMessage() );
                 throw new RuntimeException( ex );
             } catch (ExecutionException ex) {
+                System.out.println( "Exploto che: " + ex.getMessage() );
                 throw new RuntimeException( ex );
             }
             
@@ -59,9 +61,9 @@ public class GsonHelper {
         return product;
     }
     
-    public Map< String, Object > toStringAndObjectMap(Reader in) {
+    public Map< String, String > toStringMap(Reader in) {
         
-        Map< String, Object > product = g.fromJson( g.newJsonReader( in ), HashMap.class );
+        Map< String, String > product = g.fromJson( g.newJsonReader( in ), HashMap.class );
         
         return product;
     }

@@ -9,9 +9,9 @@ public class ListarDataService {
     private static String simbolosFileName = "simbolos.json";
     private static String databaseFileName = "db.json";
     
-    public static Map< String, Object > listarSimbolos() {
+    public static Map< String, String > listarSimbolos() {
         
-        Map< String, Object > out = null;
+        Map< String, String > out = null;
         
         try {
             
@@ -30,7 +30,9 @@ public class ListarDataService {
         Map< String, Double > out = new HashMap<>();
         
         try {
+            
             out = JsonFileHelperService.leerDB( databaseFileName );
+            
         } catch( IOException e ) {
             throw new RuntimeException( e );
         }

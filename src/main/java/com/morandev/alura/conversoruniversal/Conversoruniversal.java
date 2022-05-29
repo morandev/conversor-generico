@@ -9,6 +9,5 @@ public class Conversoruniversal {
         Index clienteIndex = new Index();
         clienteIndex.setVisible(true);
 
-
     }
 }

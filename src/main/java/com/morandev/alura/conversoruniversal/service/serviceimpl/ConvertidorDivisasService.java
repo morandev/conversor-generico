@@ -4,7 +4,7 @@ import com.morandev.alura.conversoruniversal.flyweight.BusquedaFactory;
 import com.morandev.alura.conversoruniversal.service.Convertidor;
 import java.math.BigDecimal;
 
-public class ConvertidorDivisasService extends Convertidor {
+public class ConvertidorDivisasService implements Convertidor {
     private BusquedaFactory clienteExchangeApi = new BusquedaFactory();
 
     @Override

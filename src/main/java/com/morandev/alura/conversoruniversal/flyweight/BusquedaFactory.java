@@ -35,7 +35,7 @@ public class BusquedaFactory {
         //KEY TO MAP
         String key = "de:" + de_divisa + "a:" + a_divisa + "fecha:" + actualDate.toString();
         
-        BigDecimal amount = BigDecimal.valueOf( monto );
+        BigDecimal amount = new BigDecimal( monto );
         
         if( !pool.isEmpty() ) {
             
@@ -44,7 +44,9 @@ public class BusquedaFactory {
                 BigDecimal rateFromPool = BigDecimal.valueOf( pool.get( key ) );
                 System.out.println("reutilize jeje");
                 
-                return rateFromPool.multiply( amount );
+                amount = amount.multiply( rateFromPool );
+                
+                return amount;
             }
             
         }
@@ -55,11 +57,14 @@ public class BusquedaFactory {
         pool.put( key , rate );
         
         PersistirDataService.persistirDatos( pool );
-        BigDecimal rateBD = BigDecimal.valueOf( rate );
+        
+        BigDecimal rateBD = new BigDecimal( rate );
         
         System.out.println("tuve que crear"); 
         
-        return amount.multiply( rateBD );
+        amount = amount.multiply( rateBD );
+        
+        return amount;
     }
     
 }
