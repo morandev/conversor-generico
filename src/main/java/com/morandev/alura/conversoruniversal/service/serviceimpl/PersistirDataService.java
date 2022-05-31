@@ -3,10 +3,21 @@ package com.morandev.alura.conversoruniversal.service.serviceimpl;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * 
+ *  Representa el servicio de guardar en archivos o de persistir informacion
+ * 
+ * @author morandev
+ */
 public class PersistirDataService {
     
-    private static String dbFileName = "db.json";
-    
+    /**
+     * 
+     *  Persiste la data en archivo
+     * 
+     * @param data
+     * @return boolean, true si los datos fueron persistidos correctamente
+     */
     public static boolean persistirDatos( Map< String, Double> data ) {
         
         boolean out = false;

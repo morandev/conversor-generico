@@ -1,21 +1,18 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.morandev.alura.conversoruniversal.views;
 
 
+import com.morandev.alura.conversoruniversal.views.conversor.ConversorDeDivisasPane;
 import java.awt.Color;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JPanel;
 import org.netbeans.lib.awtextra.AbsoluteConstraints;
 
-import com.morandev.alura.conversoruniversal.views.conversor.ConversorDivisas;
-import com.morandev.alura.conversoruniversal.views.conversor.ConversorDeOtraCosa;
-
 public class Index extends javax.swing.JFrame {
         
-    private JPanel conversorDivisas = new ConversorDivisas();
-    private JPanel conversorDeOtraCosa = new ConversorDeOtraCosa();
+    private final LocalDate actualDate = LocalDate.now();
+    
+    private JPanel conversorDivisas = new ConversorDeDivisasPane();
     private int xOnJFrameMove = 0;
     private int yOnJFrameMove = 0;
     private int xScreenDrag = 0;
@@ -24,10 +21,12 @@ public class Index extends javax.swing.JFrame {
     /**
      *  Constructor
      */
-    public Index() {
+    public Index(boolean visible) {
         initComponents();
         init();
+        this.setVisible( visible );
     }
+    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -39,6 +38,9 @@ public class Index extends javax.swing.JFrame {
         panelCloseTab = new javax.swing.JPanel();
         btnExitContainer = new javax.swing.JPanel();
         btnExitTxt = new javax.swing.JLabel();
+        headerTitleTxt = new javax.swing.JLabel();
+        headerDateTxt = new javax.swing.JLabel();
+        headerDateTextTxt = new javax.swing.JLabel();
         panelOptions = new javax.swing.JPanel();
         botonera = new javax.swing.JPanel();
         btnConversorContainer = new javax.swing.JPanel();
@@ -59,10 +61,11 @@ public class Index extends javax.swing.JFrame {
         bgIndex.setPreferredSize(new java.awt.Dimension(1017, 555));
         bgIndex.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        panelHeader.setBackground(new java.awt.Color(151, 149, 144));
+        panelHeader.setBackground(new java.awt.Color(107, 125, 137));
+        panelHeader.setForeground(new java.awt.Color(107, 125, 137));
         panelHeader.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        titleTxt.setBackground(new java.awt.Color(151, 149, 144));
+        titleTxt.setBackground(new java.awt.Color(107, 125, 137));
         titleTxt.setFont(new java.awt.Font("Consolas", 1, 24)); // NOI18N
         titleTxt.setForeground(new java.awt.Color(185, 172, 140));
         titleTxt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -72,7 +75,7 @@ public class Index extends javax.swing.JFrame {
 
         bgIndex.add(panelHeader, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 320, 160));
 
-        panelCloseTab.setBackground(new java.awt.Color(212, 241, 244));
+        panelCloseTab.setBackground(new java.awt.Color(201, 123, 95));
         panelCloseTab.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 panelCloseTabMouseDragged(evt);
@@ -122,12 +125,34 @@ public class Index extends javax.swing.JFrame {
 
         panelCloseTab.add(btnExitContainer, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 0, 50, 50));
 
+        headerTitleTxt.setBackground(new java.awt.Color(255, 255, 255));
+        headerTitleTxt.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
+        headerTitleTxt.setForeground(new java.awt.Color(255, 255, 255));
+        headerTitleTxt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        headerTitleTxt.setText("CONVERSOR DE DIVISAS");
+        panelCloseTab.add(headerTitleTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 160, 50));
+
+        headerDateTxt.setBackground(new java.awt.Color(255, 255, 255));
+        headerDateTxt.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
+        headerDateTxt.setForeground(new java.awt.Color(255, 255, 255));
+        headerDateTxt.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        headerDateTxt.setText("29/05/22");
+        panelCloseTab.add(headerDateTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 0, 110, 50));
+
+        headerDateTextTxt.setBackground(new java.awt.Color(255, 255, 255));
+        headerDateTextTxt.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
+        headerDateTextTxt.setForeground(new java.awt.Color(255, 255, 255));
+        headerDateTextTxt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        headerDateTextTxt.setText("FECHA:");
+        panelCloseTab.add(headerDateTextTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 0, 50, 50));
+
         bgIndex.add(panelCloseTab, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 0, 690, 50));
 
-        panelOptions.setBackground(new java.awt.Color(151, 149, 144));
+        panelOptions.setBackground(new java.awt.Color(107, 125, 137));
         panelOptions.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        botonera.setBackground(new java.awt.Color(184, 169, 141));
+        botonera.setBackground(new java.awt.Color(107, 125, 137));
+        botonera.setForeground(new java.awt.Color(107, 125, 137));
 
         btnConversorContainer.setBackground(new java.awt.Color(131, 140, 155));
 
@@ -166,7 +191,7 @@ public class Index extends javax.swing.JFrame {
         btnConversorTemperaturaTxt.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
         btnConversorTemperaturaTxt.setForeground(new java.awt.Color(185, 172, 140));
         btnConversorTemperaturaTxt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        btnConversorTemperaturaTxt.setText("Conversor Temperatura");
+        btnConversorTemperaturaTxt.setText("Future Next Converter");
         btnConversorTemperaturaTxt.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnConversorTemperaturaTxt.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -210,7 +235,8 @@ public class Index extends javax.swing.JFrame {
 
         panelOptions.add(botonera, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 320, 280));
 
-        footerContainer.setBackground(new java.awt.Color(151, 149, 144));
+        footerContainer.setBackground(new java.awt.Color(107, 125, 137));
+        footerContainer.setForeground(new java.awt.Color(107, 125, 137));
 
         footerTxt.setBackground(new java.awt.Color(128, 138, 152));
         footerTxt.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
@@ -258,10 +284,15 @@ public class Index extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     /**
-    * Configuraciones iniciales del Frame
+    *   Configuraciones iniciales del Frame
     */
     private void init() {
         actualizarPanelConversor( conversorDivisas );
+        establecerFecha();
+    }
+    
+    private void establecerFecha() {
+        this.headerDateTxt.setText( this.actualDate.format( DateTimeFormatter.ofPattern("d MMM uuuu") ));
     }
     
     public void actualizarPanelConversor(JPanel nuevoPanel) {
@@ -291,7 +322,7 @@ public class Index extends javax.swing.JFrame {
 
     private void btnConversorDivisasTxtMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnConversorDivisasTxtMouseEntered
         this.btnConversorContainer.setBackground( new Color(140, 156, 140) );
-        this.btnConversorDivisasTxt.setForeground( Color.white );
+        this.btnConversorDivisasTxt.setForeground( new Color( 245,244,246 ) );
     }//GEN-LAST:event_btnConversorDivisasTxtMouseEntered
 
     private void btnConversorDivisasTxtMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnConversorDivisasTxtMouseExited
@@ -300,7 +331,7 @@ public class Index extends javax.swing.JFrame {
     }//GEN-LAST:event_btnConversorDivisasTxtMouseExited
 
     private void footerTxtMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_footerTxtMouseEntered
-        this.footerTxt.setForeground( new Color(255, 193, 41) );
+        this.footerTxt.setForeground( new Color( 245,244,246 ) );
     }//GEN-LAST:event_footerTxtMouseEntered
 
     private void footerTxtMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_footerTxtMouseExited
@@ -324,17 +355,17 @@ public class Index extends javax.swing.JFrame {
     }//GEN-LAST:event_btnConversorDivisasTxtMouseClicked
 
     private void btnConversorTemperaturaTxtMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnConversorTemperaturaTxtMouseEntered
-        this.btnConversorContainer1.setBackground( new Color(140, 156, 140) );
-        this.btnConversorTemperaturaTxt.setForeground( Color.white );
+        this.btnConversorContainer1.setBackground( new Color( 140, 156, 140 ) );
+        this.btnConversorTemperaturaTxt.setForeground( new Color( 245,244,246 ) );
     }//GEN-LAST:event_btnConversorTemperaturaTxtMouseEntered
 
     private void btnConversorTemperaturaTxtMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnConversorTemperaturaTxtMouseExited
-        this.btnConversorContainer1.setBackground( new Color(131, 140, 155) );
-        this.btnConversorTemperaturaTxt.setForeground( new Color(185,172,140) );
+        this.btnConversorContainer1.setBackground( new Color( 131, 140, 155 ) );
+        this.btnConversorTemperaturaTxt.setForeground( new Color( 185,172,140 ) );
     }//GEN-LAST:event_btnConversorTemperaturaTxtMouseExited
 
     private void btnConversorTemperaturaTxtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnConversorTemperaturaTxtMouseClicked
-        actualizarContentPane( this.panelConversor, this.conversorDeOtraCosa );
+        actualizarContentPane( this.panelConversor, this.conversorDivisas );
     }//GEN-LAST:event_btnConversorTemperaturaTxtMouseClicked
 
 
@@ -349,10 +380,15 @@ public class Index extends javax.swing.JFrame {
     private javax.swing.JLabel btnExitTxt;
     private javax.swing.JPanel footerContainer;
     private javax.swing.JLabel footerTxt;
+    private javax.swing.JLabel headerDateTextTxt;
+    private javax.swing.JLabel headerDateTxt;
+    private javax.swing.JLabel headerTitleTxt;
     private javax.swing.JPanel panelCloseTab;
     private javax.swing.JPanel panelConversor;
     private javax.swing.JPanel panelHeader;
     private javax.swing.JPanel panelOptions;
     private javax.swing.JLabel titleTxt;
     // End of variables declaration//GEN-END:variables
+
+
 }

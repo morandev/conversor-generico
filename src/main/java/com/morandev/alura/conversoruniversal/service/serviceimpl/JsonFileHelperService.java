@@ -1,6 +1,6 @@
 package com.morandev.alura.conversoruniversal.service.serviceimpl;
 
-import com.morandev.alura.conversoruniversal.helpers.GsonHelper;
+import com.morandev.alura.conversoruniversal.utils.GsonHelper;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -11,12 +11,27 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+/**
+ * 
+ *  Representa el servicio de interaccion con archivos. En especial archivos .json, que son utilizados
+ *  en esta apliacion
+ * 
+ * @author morandev
+ */
 public class JsonFileHelperService {
     
     private final static GsonHelper gsonHelper = new GsonHelper();
     private final static String RUTA_POR_DEFECTO = "./src/main/java/com/morandev/alura/conversoruniversal/db/";
     
-    
+    /**
+     * 
+     *  Lee la data el archivo db.json. Este archivo representa la base de datos y contiene la informacion del
+     *  usuario o de la aplicacion.
+     * 
+     * @param fileName
+     * @return
+     * @throws IOException 
+     */
     public static Map< String, Double > leerDB( String fileName ) throws IOException {
         
         if ( fileName.isBlank() || fileName.isEmpty() || fileName == null )
@@ -39,7 +54,7 @@ public class JsonFileHelperService {
     }
     
     /**
-     *  Lee la data del archivo simbolos.json. Esto es los nombres de las divisas y sus abreviaciones.
+     *  Lee la data del archivo simbolos.json. Este archivo contiene los nombres de las divisas y sus abreviaciones.
      * 
      * @param fileName
      * @return
@@ -69,6 +84,14 @@ public class JsonFileHelperService {
         return dataParsed;
     }
     
+    /**
+     * 
+     *  Persiste la data en archivo. Por defecto en this.RUTA_POR_DEFECTO
+     * 
+     * @param data
+     * @return boolean, true si la data fue persistida con exito
+     * @throws IOException 
+     */
     public static boolean persistirData( Map< String, Double >  data ) throws IOException {
 
         boolean exito = false;
