@@ -647,7 +647,7 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
 
                     @Override
                     protected BigDecimal doInBackground() throws Exception {
-                        convertAndPrintInputData( userInput );
+                        convertAndPrintInputData( userInput1 );
 
                         return finalAmount;
                     }
@@ -671,7 +671,7 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
 
                     @Override
                     protected BigDecimal doInBackground() throws Exception {
-                        convertAndPrintInputData( userInput1 );
+                        convertAndPrintInputData( userInput );
 
                         return finalAmount;
                     }
