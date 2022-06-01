@@ -242,7 +242,7 @@ public class Index extends javax.swing.JFrame {
         footerTxt.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
         footerTxt.setForeground(new java.awt.Color(185, 172, 140));
         footerTxt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        footerTxt.setText("<html><p><center>© 2021 github.com/morandev <br> Alura Java Challenge </center></p></html>");
+        footerTxt.setText("<html><p><center>© 2022 github.com/morandev <br> Alura Java Challenge </center></p></html>");
         footerTxt.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         footerTxt.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {

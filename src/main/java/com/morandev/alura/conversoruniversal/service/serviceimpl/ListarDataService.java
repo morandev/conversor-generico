@@ -17,7 +17,7 @@ public class ListarDataService {
     
     /**
      * 
-     * Devuelve un mapa con todas las divisas soportadas. La clase es la abreviacion de la divisa y
+     * Devuelve un mapa con todas las divisas soportadas. La clave es la abreviacion de la divisa y
      * el valor es el nombre completo.
      * 
      * @return 

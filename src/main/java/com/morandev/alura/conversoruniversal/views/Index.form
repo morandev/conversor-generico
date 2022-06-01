@@ -423,7 +423,7 @@
                       <Color blue="8c" green="ac" red="b9" type="rgb"/>
                     </Property>
                     <Property name="horizontalAlignment" type="int" value="0"/>
-                    <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;p&gt;&lt;center&gt;&#xa9; 2021 github.com/morandev &lt;br&gt; Alura Java Challenge &lt;/center&gt;&lt;/p&gt;&lt;/html&gt;"/>
+                    <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;p&gt;&lt;center&gt;&#xa9; 2022 github.com/morandev &lt;br&gt; Alura Java Challenge &lt;/center&gt;&lt;/p&gt;&lt;/html&gt;"/>
                     <Property name="verticalAlignment" type="int" value="1"/>
                   </Properties>
                   <Events>

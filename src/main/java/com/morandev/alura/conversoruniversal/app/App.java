@@ -6,7 +6,7 @@ import com.morandev.alura.conversoruniversal.views.Index;
  * 
  *  GITHUB: https://github.com/morandev
  *  REPOSITORY: https://github.com/morandev/conversor-generico
- *  LINKEDIN: https://www.linkedin.com/feed/
+ *  LINKEDIN: https://www.linkedin.com/in/facumoransi/
  * 
  * 
  *  @author morandev

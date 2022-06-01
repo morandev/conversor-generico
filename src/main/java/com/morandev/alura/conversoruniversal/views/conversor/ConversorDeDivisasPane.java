@@ -8,27 +8,38 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
+import javax.swing.SwingWorker.StateValue;
 
 import com.morandev.alura.conversoruniversal.service.serviceimpl.ListarDataService;
 import com.morandev.alura.conversoruniversal.service.serviceimpl.ConvertidorDivisasService;
 
 public class ConversorDeDivisasPane extends javax.swing.JPanel {
-
+    
+    
+    /*
+        
+        CONSTS AND VARS
+    
+    */
+    private ConvertidorDivisasService convertidor = new ConvertidorDivisasService();
+    private Map< String, String > simbolos = new HashMap<>();
+    private BigDecimal finalAmount = new BigDecimal(0.0);
+    
     private final int MAX_INPUTS_DIGITS = 11;
     
-    private ConvertidorDivisasService convertidor = new ConvertidorDivisasService();
     private boolean configOfComboBoxIsFinished = false;
-    private Map< String, String > simbolos = new HashMap<>();
-    
-    BigDecimal finalAmount = new BigDecimal(0.0);
-    
     private String divisaFrom = "";
     private String divisaTo = "";
+
+    
+    SwingWorker< BigDecimal, Void > worker;
 
     /**
      * 
@@ -41,7 +52,7 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
     }
     
     /**
-    * Configuraciones iniciales del Panel
+    * Configuraciones iniciales 
     */
     private void init() {
         setComboBoxesConfig();
@@ -99,11 +110,18 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
         this.divisaTo = getDivisa( cmbDivisa );
     }
      
+    /**
+     * 
+     *  Obtener item seleccionado que sea valido, desde un combo box
+     * 
+     * @param comboBoxDivisa
+     * @return 
+     */
     private String getDivisa( JComboBox<String> comboBoxDivisa ) {
         
         String valueSelected = (String) comboBoxDivisa.getSelectedItem();
         
-        if( valueSelected == null || simbolos.containsValue( valueSelected ) ) 
+        if( valueSelected == null ) 
             throw new RuntimeException("Ningun match de el elemento seleccionado del parametro comboBoxDivisa\n con divisas");
         
         //El valor seleccionado del comboBoxVista trae espacios agregados 
@@ -112,14 +130,26 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
         return valueSelected;
     }
     
-    private String getDivisaName( String divisaKey ) {
+    /**
+     * 
+     *  Retorna el nombre completo de una divisa como resultado de buscar su abreviacion
+     * 
+     * @param divisaKey
+     * @return 
+     */
+    private String getDivisaName( String divisaAbbrKey ) {
         
-        String divisaName = this.simbolos.get( divisaKey );
+        String divisaName = this.simbolos.get( divisaAbbrKey );
 
         return divisaName;
     }
     
-    private void convertAndPrintInputData(JTextField input) {
+    /**
+     *  Metodo sincrono para convertir input del usuario en data, formartearla y presentarla
+     * 
+     * @param input 
+     */
+    private synchronized void convertAndPrintInputData(JTextField input) {
         
         String userInputStr = input.getText();
         String userInputConvertedStr = "";
@@ -130,7 +160,7 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
             userInputStr = "1";
         
         // input a big decimal
-        java.math.BigDecimal finalValidInput = new java.math.BigDecimal( userInputStr );
+        BigDecimal finalValidInput = new BigDecimal( userInputStr );
 
         convertDivise( divisaFrom, divisaTo, finalValidInput );
         
@@ -169,8 +199,16 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
         return amountFormatted;
     }
     
+    /**
+     * 
+     *  Actualiza la GUI con la informacion de las divisas con las cuales el usuario esta en interaccion
+     * 
+     * @param amountFormatted
+     * @param divisaName
+     * @param label 
+     */
     private void updateDescription( String amountFormatted, String divisaName, JLabel label ) {
-        String desc = "<html><p>" + amountFormatted + " " + divisaName;
+        String desc = "<html><p>" + amountFormatted + " " + divisaName + "</p></html>";
         label.setText( desc );
     }
     
@@ -182,23 +220,32 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
         updateDescription( amountFormatted, divisaName, this.divisaNameTxt1 );
     }
     
+    /**
+     * 
+     *  Convierte data del usuario en data
+     * 
+     * @param divisaFromName
+     * @param divisaToName
+     * @param amount 
+     */
     private void convertDivise( String divisaFromName, String divisaToName, java.math.BigDecimal amount ) {
        
-        java.math.BigDecimal amountConverted = new java.math.BigDecimal(0);
+        BigDecimal amountConverted = new BigDecimal(0);
         
         try {
-            
             amountConverted = this.convertidor.convertir( divisaFromName, divisaToName, amount.doubleValue() );
-            
         } catch ( Exception e ) {
-            
             throw new RuntimeException("converDivise: no pudo completar la conversion: " + e.getMessage() );
-            
         }
         
         this.finalAmount = amountConverted;
     }
     
+    /**
+     * 
+     *  Encargado de intercambiar valores en la GUI cuando el usuario lo solicite
+     * 
+     */
     private void doSwitch() {
         doItemSwich( this.cmbDivisa, this.cmbDivisa1 ); 
         doInputSwich( this.userInput, this.userInput1 );
@@ -260,6 +307,54 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
     
     private void setConfigOfComboBoxIsFinished(boolean enabled) {
         this.configOfComboBoxIsFinished = enabled;
+    }
+
+    /**
+     * 
+     *  ASINCRONISMO
+     * 
+     * @param input
+     * @return 
+     */
+    private SwingWorker<BigDecimal, Void> exchangeWorker(JTextField input) {
+        
+        worker = new SwingWorker<BigDecimal, Void>() {
+                
+            @Override
+            protected BigDecimal doInBackground() throws Exception {
+                convertAndPrintInputData( input );
+                
+                return finalAmount;
+            }
+
+        };
+        
+        //  MEMORY OPTIMIZATION
+        worker.addPropertyChangeListener( new PropertyChangeListener() {
+            
+            @Override
+            public void propertyChange(final PropertyChangeEvent event) {
+
+                if( event.getPropertyName().equals("state") ) {
+
+                    switch ((StateValue) event.getNewValue()) {
+                        case DONE:
+                            //TODO: future implementation
+                            //progressBar.setVisible(false);
+                            worker = null;
+                            break;
+                        case STARTED:
+                        case PENDING:
+                            //TODO: future implementation
+                            //progressBar.setVisible(true);
+                            //progressBar.setIndeterminate(true);
+                            break;
+                    }
+                }
+            }
+        });
+
+        return worker;
     }
     
   @SuppressWarnings("unchecked")
@@ -578,18 +673,10 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
         }
         
         if( !(evt.getKeyCode() == KeyEvent.VK_ENTER) ) {
-            SwingWorker<BigDecimal, Void> worker = new SwingWorker<BigDecimal, Void>() {
 
-                @Override
-                protected BigDecimal doInBackground() throws Exception {
-                    convertAndPrintInputData( userInput );
+            SwingWorker< BigDecimal, Void > workerInput = exchangeWorker( userInput );
+            workerInput.execute();
 
-                    return finalAmount;
-                }
-
-            };
-
-            worker.execute();
         }
     }//GEN-LAST:event_userInputKeyReleased
 
@@ -614,18 +701,9 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
 
         if( !(evt.getKeyCode() == KeyEvent.VK_ENTER) ) {
                         
-            SwingWorker<BigDecimal, Void> worker = new SwingWorker<BigDecimal, Void>() {
-                
-                @Override
-                protected BigDecimal doInBackground() throws Exception {
-                    convertAndPrintInputData( userInput1 );
-                    
-                    return finalAmount;
-                }
+            SwingWorker< BigDecimal, Void > workerInput1 = exchangeWorker( userInput1 );
+            workerInput1.execute();
 
-            };
-            
-            worker.execute();
         }
     }//GEN-LAST:event_userInput1KeyReleased
 
@@ -643,18 +721,9 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
             setDivisaTo( cmbDivisa1 );
             if ( configOfComboBoxIsFinished  ) {
                             
-                SwingWorker<BigDecimal, Void> worker = new SwingWorker<BigDecimal, Void>() {
+                SwingWorker< BigDecimal, Void > workerCmbDivisa1 = exchangeWorker( userInput1 );
+                workerCmbDivisa1.execute();
 
-                    @Override
-                    protected BigDecimal doInBackground() throws Exception {
-                        convertAndPrintInputData( userInput1 );
-
-                        return finalAmount;
-                    }
-
-                };
-                
-                worker.execute();
             }
                 
         }                            
@@ -665,23 +734,14 @@ public class ConversorDeDivisasPane extends javax.swing.JPanel {
         
         if( evt.getStateChange() == 1 ) {
             setDivisaFrom( cmbDivisa );
+
             if ( configOfComboBoxIsFinished  ) {
-                            
-                SwingWorker<BigDecimal, Void> worker = new SwingWorker<BigDecimal, Void>() {
 
-                    @Override
-                    protected BigDecimal doInBackground() throws Exception {
-                        convertAndPrintInputData( userInput );
+                SwingWorker< BigDecimal, Void > workerCmbDivisa = exchangeWorker( userInput );
+                workerCmbDivisa.execute();
 
-                        return finalAmount;
-                    }
-
-                };
-                
-                worker.execute();
-            }
-        }     
-        
+            }    
+        }
     }//GEN-LAST:event_cmbDivisaItemStateChanged
 
     private void userInputKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_userInputKeyPressed
