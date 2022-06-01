@@ -1,7 +1,7 @@
 # Conversor de Divisas (Currency Exchange)
 
 ## Conversor de divisas hecho en Java
-![screenshot1-convertidor](https://user-images.githubusercontent.com/93687744/171074824-8d00f53f-b278-4bce-ab16-630187660880.png)
+![screenshot1-convertidor](https://user-images.githubusercontent.com/93687744/171453556-026c7600-6627-4bc6-8424-087ec06e1108.png)
 
 
 
