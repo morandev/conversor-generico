@@ -8,6 +8,8 @@
 ## Descripción del Proyecto
 Este proyecto forma parte de un challenge en el lenguaje Java. Al completar cursos de java en la plataforma de [Alura](https://www.aluracursos.com/) comienza una serie de sprints y a los alumnos nos brindan un tablero de trello para ayudar a organizarnos y asi poder completar el challenge, dejando a nuestra voluntad la creatividad a aplicar.
 
+## Como utilizo el proyecto en mi maquina
+Renombra el archivo .env.example a .env y dentro de este reemplaza your-key-in-plain con tu propia key de la api de exchange
 # En esta app utilizo:
 - [Swing](https://www.javatpoint.com/java-swing)
 - [Maven](https://maven.apache.org/what-is-maven.html)
