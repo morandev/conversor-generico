@@ -16,4 +16,4 @@ Renombra el archivo .env.example a .env y dentro de este reemplaza your-key-in-p
 - [Java Dotenv](https://mvnrepository.com/artifact/io.github.cdimascio/java-dotenv/5.2.2)
 - [Exchange API](https://apilayer.com/marketplace/exchangerates_data-api)
 - [Gson](https://mvnrepository.com/artifact/com.google.code.gson/gson/2.9.0)
-
+- [UNIREST](https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java)
